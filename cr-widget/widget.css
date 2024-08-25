@@ -1,0 +1,40 @@
+/* Styling for CodersRank Widget */
+codersrank-summary {
+    --avatar-size: 80px; /* Default value: '80px ' */
+    --badge-bg-color: #e1e4e8; /* Default value: '#fff ' */
+    --badge-border-radius: 6px; /* Slightly increased to match the overall theme */
+    --badge-border: 1px solid #d1d5da; /* Default value: 'none ' */
+    --badge-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); /* Default value: '0px 1px 2px rgba(23, 36, 50, 0.3) ' */
+    --badge-icon-size: 24px; /* Default value: '24px ' */
+    --badge-location-font-size: 0.85em; /* Default value: '0.85em ' */
+    --badge-location-font-weight: normal; /* Default value: 'normal ' */
+    --badge-margin: 10px; /* Default value: '8px ' */
+    --badge-padding: 6px; /* Default value: '4px ' */
+    --badge-rank-font-size: 0.85em; /* Default value: '0.85em ' */
+    --badge-rank-font-weight: bold; /* Default value: 'bold ' */
+    --badge-technology-font-size: 14px; /* Default value: 'inherit ' */
+    --badge-technology-font-weight: 600; /* Default value: '600 ' */
+    --badge-text-color: #000; /* Default value: '#000 ' */
+    --badges-padding: 10px; /* Default value: '8px ' */
+    --bg-color: #f3f4f6; /* Default value: '#edf1f3 ' */
+    --border-radius: 10px; /* Default value: '4px ' */
+    --border: 1px solid #d1d5da; /* Slightly softer border color */
+    --branding-text-color: inherit; /* Default value: 'inherit ' */
+    --header-bg-color: #2d333b; /* Default value: '#72a0a8 ' */
+    --header-padding: 12px; /* Default value: '8px ' */
+    --header-text-color: #fff; /* Default value: '#fff ' */
+    --name-font-size: 1.2em; /* Default value: 'inherit ' */
+    --name-font-weight: bold; /* Default value: 'bold ' */
+    --preloader-color: #2d333b; /* Default value: '#72a0a8 ' */
+    --rank-font-size: 1em; /* Default value: 'inherit ' */
+    background-color: #f3f4f6;
+    border-radius: 10px;
+    border: 1px solid #d1d5da;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.03); /* Slightly softer shadow */
+    display: block;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0 auto;
+    max-width: 600px;
+    padding: 25px;
+    width: 100%;
+}
