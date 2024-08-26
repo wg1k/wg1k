@@ -20,7 +20,7 @@ codersrank-summary {
     --border-radius: 10px; /* Default value: '4px ' */
     --border: 1px solid #d1d5da; /* Slightly softer border color */
     --branding-text-color: inherit; /* Default value: 'inherit ' */
-    --header-bg-color: #2d333b; /* Default value: '#72a0a8 ' */
+    --header-bg-color: #000036; /* Default value: '#72a0a8 ' */
     --header-padding: 12px; /* Default value: '8px ' */
     --header-text-color: #fff; /* Default value: '#fff ' */
     --name-font-size: 1.2em; /* Default value: 'inherit ' */
