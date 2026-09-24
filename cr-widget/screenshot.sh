@@ -1,11 +1,29 @@
 #!/bin/bash
-declare -r script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 set -ex
-declare puppeteer_image='ghcr.io/puppeteer/puppeteer:16.1.0'
-declare docker_uid="$(docker run --rm "${puppeteer_image}" id -u)"
-sudo chown -R "${docker_uid}" "${script_dir}"
-trap 'sudo chown -R "${USER}" "${script_dir}"' EXIT
-docker run -i --init --rm \
-	-v "${script_dir}:/app" \
-	"${puppeteer_image}" \
-	bash -c 'cp /app/screenshot.js .; node screenshot.js'
+
+main() {
+	local script_dir
+	script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
+	local puppeteer_image='ghcr.io/puppeteer/puppeteer:25.12.0'
+	local image_home
+	image_home="$(docker run --rm "${puppeteer_image}" printenv HOME)"
+
+	local -a extra_args=()
+	if docker --version | grep -qi podman; then
+		extra_args+=(
+			--userns=keep-id
+		)
+	fi
+
+	docker run -i --init --rm \
+		"${extra_args[@]}" \
+		--user "$(id -u):$(id -g)" \
+		--env "NODE_PATH=${image_home}/node_modules" \
+		--env "PUPPETEER_CACHE_DIR=${image_home}/.cache/puppeteer" \
+		--volume "${script_dir}:/app" \
+		--workdir /app \
+		"${puppeteer_image}" \
+		node screenshot.js
+}
+
+main "$@"
