@@ -8,7 +8,6 @@ const puppeteer = require('puppeteer');
             '--disable-dev-shm-usage',
             '--disable-gpu',
         ],
-        executablePath: '/usr/bin/google-chrome',
     });
 
     const page = await browser.newPage();
@@ -19,7 +18,7 @@ const puppeteer = require('puppeteer');
     await page.goto('file:///app/widget.html', { waitUntil: 'networkidle2', timeout: 60000 });
 
     await page.waitForSelector('codersrank-summary');
-    await page.waitForTimeout(2000);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Ensure all images are loaded
     await page.evaluate(() => {
