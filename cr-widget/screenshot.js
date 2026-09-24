@@ -7,7 +7,6 @@ const puppeteer = require('puppeteer');
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--disable-gpu',
-            '--disable-crash-reporter',
         ],
     });
 

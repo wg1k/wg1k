@@ -18,6 +18,7 @@ main() {
 	docker run -i --init --rm \
 		"${extra_args[@]}" \
 		--user "$(id -u):$(id -g)" \
+		--env HOME=/tmp \
 		--env "NODE_PATH=${image_home}/node_modules" \
 		--env "PUPPETEER_CACHE_DIR=${image_home}/.cache/puppeteer" \
 		--volume "${script_dir}:/app" \
