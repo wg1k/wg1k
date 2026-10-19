@@ -1,4 +1,4 @@
-name: Refresh CodersRank widget
+name: Refresh profile widgets
 
 on:
   schedule:
@@ -17,19 +17,24 @@ jobs:
       - name: Regenerate widget screenshot
         run: ./cr-widget/screenshot.sh
 
-      - name: Commit updated widget if changed
+      - name: Refresh Stack Overflow card
+        continue-on-error: true
+        run: ./stackoverflow/refresh.sh
+
+      - name: Commit updated widgets if changed
         run: |
-          if git diff --quiet -- cr-widget/widget.png; then
-            echo "No change in widget.png"
+          if git diff --quiet -- cr-widget/widget.png stackoverflow/card.svg; then
+            echo "No change in widgets"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add cr-widget/widget.png
+          git add cr-widget/widget.png stackoverflow/card.svg
           git commit -m "$(cat <<'EOF'
-          chore(cr-widget): refresh widget screenshot
+          chore: refresh profile widgets
 
-          Scheduled update of the CodersRank widget image.
+          Scheduled update of the CodersRank widget image and the
+          Stack Overflow card.
           EOF
           )"
           git push
