@@ -36,6 +36,22 @@ const SETTLE_MS = 4000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const LOWER_CARDS = ['.card-languages', '.card-stackoverflow'];
+
+const heightOf = async (page, selector) => {
+    const card = await page.$(selector);
+    const { height } = await card.boundingBox();
+    return Math.round(height);
+};
+
+const assertEqualHeights = async (page, selectors) => {
+    const heights = await Promise.all(selectors.map((selector) => heightOf(page, selector)));
+    if (new Set(heights).size > 1) {
+        const detail = selectors.map((selector, i) => `${selector}=${heights[i]}`).join(', ');
+        throw new Error(`Cards differ in height: ${detail}`);
+    }
+};
+
 const screenshotCard = async (page, [selector, file]) => {
     const card = await page.$(selector);
     await card.screenshot({ path: `/app/${file}`, omitBackground: true });
@@ -58,6 +74,8 @@ const renderCards = async (browser) => {
     if (brokenImages.length > 0) {
         throw new Error(`Broken images:\n${brokenImages.join('\n')}`);
     }
+
+    await assertEqualHeights(page, LOWER_CARDS);
 
     for (const card of CARDS) {
         await screenshotCard(page, card);

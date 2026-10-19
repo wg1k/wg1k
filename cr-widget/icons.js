@@ -4,10 +4,7 @@
     const SIMPLE_ICONS_INDEX = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/data/simple-icons.json';
     const DEVICON = 'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0';
 
-    const NAME_ALIASES = {
-        Shell: 'Bash',
-        HTML: 'HTML5',
-    };
+    const { resolveName, findSimpleIconSlug, findDevicon } = window.iconLookup;
 
     const repairs = new Set();
     const unrepaired = [];
@@ -29,28 +26,17 @@
     const deviconIndex = fetchOnce(`${DEVICON}/devicon.json`);
 
     const simpleIconsUrl = async (name) => {
-        const target = name.toLowerCase();
-        const aliasesOf = (icon) => Object.values(icon.aliases || {}).flat().filter((alias) => typeof alias === 'string');
-        const namesOf = (icon) => [icon.title, ...aliasesOf(icon)].map((n) => n.toLowerCase());
-        const icons = await simpleIconsIndex();
-        const icon = icons.find((i) => namesOf(i).includes(target))
-            || icons.find((i) => i.title.toLowerCase().split(/\W+/).includes(target));
-        return icon && `${SIMPLE_ICONS}/${icon.slug}`;
+        const slug = findSimpleIconSlug(await simpleIconsIndex(), name);
+        return slug && `${SIMPLE_ICONS}/${slug}`;
     };
 
     const deviconUrl = async (name) => {
-        const target = name.toLowerCase();
-        const icons = await deviconIndex();
-        const icon = icons.find((i) => [i.name, ...i.altnames].some((n) => n.toLowerCase() === target));
-        if (!icon) {
-            return undefined;
-        }
-        const style = icon.versions.svg.includes('original') ? 'original' : icon.versions.svg[0];
-        return `${DEVICON}/icons/${icon.name}/${icon.name}-${style}.svg`;
+        const icon = findDevicon(await deviconIndex(), name);
+        return icon && `${DEVICON}/icons/${icon.name}/${icon.name}-${icon.style}.svg`;
     };
 
     const fallbackUrls = async (language) => {
-        const name = NAME_ALIASES[language] || language;
+        const name = resolveName(language);
         const urls = [await simpleIconsUrl(name), await deviconUrl(name)];
         return urls.filter(Boolean);
     };
