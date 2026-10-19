@@ -10,6 +10,7 @@
     };
 
     const repairs = new Set();
+    const unrepaired = [];
 
     const fetchOnce = (url) => {
         let index;
@@ -68,7 +69,7 @@
                 return;
             }
         }
-        console.error(`No icon found for ${language}`);
+        unrepaired.push(language);
     };
 
     const track = (repair) => {
@@ -85,6 +86,9 @@
     window.iconsRepaired = async () => {
         while (repairs.size > 0) {
             await Promise.allSettled([...repairs]);
+        }
+        if (unrepaired.length > 0) {
+            throw new Error(`No icon found for ${unrepaired.join(', ')}`);
         }
     };
 

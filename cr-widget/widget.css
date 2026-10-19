@@ -38,3 +38,39 @@ codersrank-summary {
     padding: 25px;
     width: 100%;
 }
+
+.cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    height: 260px;
+    overflow: hidden;
+}
+
+.card img {
+    display: block;
+}
+
+.card-languages {
+    width: 455px;
+}
+
+/* The source SVG has a 5px margin around its 350x200 frame; 1.3 scales the frame to the card height. */
+.card-languages img {
+    height: 273px;
+    margin: -6.5px;
+    width: 468px;
+}
+
+.card-stackoverflow {
+    width: 175px;
+}
+
+.card-stackoverflow img {
+    height: 260px;
+    width: 175px;
+}

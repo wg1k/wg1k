@@ -25,37 +25,49 @@ const findBrokenImages = (page) => page.evaluate(() =>
         .map(img => img.src)
 );
 
-const renderWidget = async (browser) => {
+const CARDS = [
+    ['codersrank-summary', 'widget.png'],
+    ['.card-languages', 'languages.png'],
+    ['.card-stackoverflow', 'stackoverflow.png'],
+];
+
+// The languages card slides its legend in over about 3 seconds.
+const SETTLE_MS = 4000;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const screenshotCard = async (page, [selector, file]) => {
+    const card = await page.$(selector);
+    await card.screenshot({ path: `/app/${file}`, omitBackground: true });
+};
+
+const renderCards = async (browser) => {
     const page = await browser.newPage();
     page.on('console', (message) => console.log(message.text()));
 
-    // Set a viewport matching the size of your widget
-    await page.setViewport({ width: 1200, height: 800, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 1200, height: 1200, deviceScaleFactor: 2 });
 
     await page.goto('file:///app/widget.html', { waitUntil: 'networkidle2', timeout: 60000 });
 
     await page.waitForSelector('codersrank-summary');
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     await page.evaluate(() => window.iconsRepaired());
     await waitForImages(page);
+    await sleep(SETTLE_MS);
 
     const brokenImages = await findBrokenImages(page);
     if (brokenImages.length > 0) {
         throw new Error(`Broken images:\n${brokenImages.join('\n')}`);
     }
 
-    const widget = await page.$('codersrank-summary');
-
-    await widget.screenshot({
-        path: '/app/widget.png',
-        omitBackground: true,
-    });
+    for (const card of CARDS) {
+        await screenshotCard(page, card);
+    }
 };
 
 const main = async () => {
     const browser = await launchBrowser();
     try {
-        await renderWidget(browser);
+        await renderCards(browser);
     } finally {
         await browser.close();
     }
