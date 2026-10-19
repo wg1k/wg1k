@@ -1,16 +1,33 @@
 const puppeteer = require('puppeteer');
 
-(async () => {
-    const browser = await puppeteer.launch({
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-        ],
-    });
+const launchBrowser = () => puppeteer.launch({
+    args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+    ],
+});
 
+const waitForImages = (page) => page.evaluate(() => {
+    const settled = (img) => img.complete
+        ? Promise.resolve()
+        : new Promise((resolve) => {
+            img.addEventListener('load', resolve, { once: true });
+            img.addEventListener('error', resolve, { once: true });
+        });
+    return Promise.all([...document.querySelectorAll('img')].map(settled));
+});
+
+const findBrokenImages = (page) => page.evaluate(() =>
+    [...document.querySelectorAll('img')]
+        .filter(img => img.naturalWidth === 0)
+        .map(img => img.src)
+);
+
+const renderWidget = async (browser) => {
     const page = await browser.newPage();
+    page.on('console', (message) => console.log(message.text()));
 
     // Set a viewport matching the size of your widget
     await page.setViewport({ width: 1200, height: 800, deviceScaleFactor: 2 });
@@ -19,29 +36,13 @@ const puppeteer = require('puppeteer');
 
     await page.waitForSelector('codersrank-summary');
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    await page.evaluate(() => window.iconsRepaired());
+    await waitForImages(page);
 
-    // Ensure all images are loaded
-    await page.evaluate(() => {
-        return new Promise((resolve) => {
-            const images = document.querySelectorAll('img');
-            let loadedImages = 0;
-            images.forEach(img => {
-                if (img.complete && img.naturalHeight !== 0) {
-                    loadedImages++;
-                } else {
-                    img.onload = () => {
-                        loadedImages++;
-                        if (loadedImages === images.length) resolve();
-                    };
-                    img.onerror = () => {
-                        loadedImages++;
-                        if (loadedImages === images.length) resolve();
-                    };
-                }
-            });
-            if (loadedImages === images.length) resolve();
-        });
-    });
+    const brokenImages = await findBrokenImages(page);
+    if (brokenImages.length > 0) {
+        throw new Error(`Broken images:\n${brokenImages.join('\n')}`);
+    }
 
     const widget = await page.$('codersrank-summary');
 
@@ -49,6 +50,18 @@ const puppeteer = require('puppeteer');
         path: '/app/widget.png',
         omitBackground: true,
     });
+};
 
-    await browser.close();
-})();
+const main = async () => {
+    const browser = await launchBrowser();
+    try {
+        await renderWidget(browser);
+    } finally {
+        await browser.close();
+    }
+};
+
+main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+});

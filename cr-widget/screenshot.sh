@@ -4,7 +4,7 @@ set -ex
 main() {
 	local script_dir
 	script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
-	local puppeteer_image='ghcr.io/puppeteer/puppeteer:25.12.0'
+	local puppeteer_image='ghcr.io/puppeteer/puppeteer:25.14.0'
 	local image_home
 	image_home="$(docker run --rm "${puppeteer_image}" printenv HOME)"
 
