@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { CODERSRANK_ICON_API, resolveIcon } = require('./icon-sources.js');
 
 const launchBrowser = () => puppeteer.launch({
     args: [
@@ -57,18 +58,41 @@ const screenshotCard = async (page, [selector, file]) => {
     await card.screenshot({ path: `/app/${file}`, omitBackground: true });
 };
 
+const answerRequest = async (request) => {
+    const url = request.url();
+    if (!url.startsWith(CODERSRANK_ICON_API)) {
+        return request.continue();
+    }
+    const svg = await resolveIcon(decodeURIComponent(url.slice(CODERSRANK_ICON_API.length)));
+    if (!svg) {
+        return request.abort();
+    }
+    return request.respond({
+        status: 200,
+        contentType: 'image/svg+xml',
+        headers: { 'access-control-allow-origin': '*' },
+        body: svg,
+    });
+};
+
+const serveIcons = async (page) => {
+    await page.setRequestInterception(true);
+    page.on('request', answerRequest);
+};
+
 const renderCards = async (browser) => {
     const page = await browser.newPage();
     page.on('console', (message) => console.log(message.text()));
 
+    await serveIcons(page);
     await page.setViewport({ width: 1200, height: 1200, deviceScaleFactor: 2 });
 
     await page.goto('file:///app/widget.html', { waitUntil: 'networkidle2', timeout: 60000 });
 
     await page.waitForSelector('codersrank-summary');
-    await page.evaluate(() => window.iconsRepaired());
     await waitForImages(page);
     await sleep(SETTLE_MS);
+    await page.evaluate(() => window.assertIconsLoaded());
 
     const brokenImages = await findBrokenImages(page);
     if (brokenImages.length > 0) {
