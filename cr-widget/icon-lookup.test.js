@@ -17,6 +17,7 @@ const DEVICONS = [
     { name: 'bash', altnames: ['bourneagainshell'], versions: { svg: ['original', 'plain'] } },
     { name: 'groovy', altnames: ['groovylang', 'apachegroovy'], versions: { svg: ['original', 'plain'] } },
     { name: 'cplusplus', altnames: ['c++', 'cpp'], versions: { svg: ['original', 'plain'] } },
+    { name: 'css3', altnames: ['cascadingstylesheets3'], versions: { svg: ['original', 'plain'] } },
     { name: 'html5', altnames: [], versions: { svg: ['original', 'plain'] } },
     { name: 'plainonly', altnames: [], versions: { svg: ['plain', 'line'] } },
 ];
@@ -29,6 +30,11 @@ test('Shell is looked up as Bash, not as the oil company', () => {
 test('HTML is looked up as HTML5', () => {
     assert.equal(findSimpleIconSlug(SIMPLE_ICONS, resolveName('HTML')), 'html5');
     assert.equal(findDevicon(DEVICONS, resolveName('HTML')).name, 'html5');
+});
+
+test('CSS is a Simple Icons title and is looked up as css3 in Devicon', () => {
+    assert.equal(findSimpleIconSlug(SIMPLE_ICONS, resolveName('CSS')), 'css');
+    assert.equal(findDevicon(DEVICONS, resolveName('CSS')).name, 'css3');
 });
 
 test('C++ matches by title and by alternative name', () => {
